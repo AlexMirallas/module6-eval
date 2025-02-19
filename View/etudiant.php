@@ -53,7 +53,7 @@
                             </div>
                             <div>
                                 <a class="btn btn-outline-primary px-4" href="mailto:<?php echo $etudiant[0]["email"]?>">Email</a>
-                                <a class="btn btn-primary px-4 ms-3">Editer info</a>
+                                <a class="btn btn-primary px-4 ms-3" href="<?php echo URL . "?page=etudiant/edit&id=" . $etudiant[0]["id"] ?>">Editer info</a>
                             </div>    
                         </div>  
                     </div>

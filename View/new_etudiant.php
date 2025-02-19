@@ -37,11 +37,11 @@
         </div>
       </div>
       <div data-mdb-input-init class="form-outline mb-4">
-        <textarea type="text" id="cv" class="form-control overflow-auto" name="cv" rows="6" value="<?php echo $data_form["cv"] ?>" ></textarea>
+        <textarea type="text" id="cv" class="form-control overflow-auto" name="cv" rows="6"><?php echo $data_form["cv"] ?></textarea>
         <label class="form-label" for="cv">CV <span class="text-muted">(max 65000 chars)</span></label>
       </div>
       <div class="mb-3 form-check">
-        <input type="checkbox" class="form-check-input" id="role" name="isAdmin" value="<?php isset($data_form["isAdmin"])? "checked" : "" ?>"/>
+        <input type="checkbox" class="form-check-input" id="role" name="isAdmin" />
         <label class="form-check-label" for="isAdmin">is Admin?</label>
       </div>
       <button  type="submit" class="btn btn-primary btn-block mb-4">Ajoute</button>
@@ -49,11 +49,6 @@
     <?php foreach($erreurs as $erreur) : ?>
         <div class="alert alert-danger" role="alert">
             <?php echo $erreur ?>
-        </div>
-    <?php endforeach; ?>
-    <?php foreach($success as $succes) : ?>
-        <div class="alert alert-success" role="alert">
-            <?php echo $succes ?>
         </div>
     <?php endforeach; ?>
 </main>

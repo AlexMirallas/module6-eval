@@ -2,8 +2,44 @@
 
 class AppController extends AbstractController
 {
-    public function home()
-    {   
+    public function home(){
+        $searchQuery = isset($_GET["searchQuery"]) ? $_GET["searchQuery"] : "";
+
+        if(!empty($searchQuery))
+        {   
+            
+            $searchQuery = htmlspecialchars($searchQuery);
+            $searchQuery = trim($searchQuery);
+            $searchQuery = stripslashes($searchQuery);
+            $searchQuery = "%".$searchQuery."%";
+            $sql = "SELECT * FROM etudiants WHERE prenom LIKE :searchQuery OR nom LIKE :searchQuery OR email LIKE :searchQuery OR specialite LIKE :searchQuery";
+
+            $etudiants = BDD::getInstance()->query($sql, ["searchQuery" => $searchQuery]);
+
+            if(empty($etudiants)){
+                $data = [
+                    "titre" => "Erreur",
+                    "contenu" => [
+                        "num" => 404,
+                        "msg" => "Aucun etudiant ne correspond a votre recherche"
+                    ]
+                ];
+    
+                $this->render("erreur", $data);
+                die();
+            }else{
+                $data = [
+                    "titre" => "Recherche",
+                    "etudiants" => $etudiants
+                ];
+                $this->render("home", $data);
+                die();
+            }
+            
+        }
+
+        
+
         $data=[
             "titre" => "Accueil",
             "etudiants" =>BDD::getInstance()->query("SELECT * FROM etudiants")
@@ -47,10 +83,10 @@ class AppController extends AbstractController
         $dt_naissance = "";
         $specialite = "";
         $cv = "";
-        $isAdmin = false;
+        $isAdmin = 0;
 
         $erreurs = [];
-        $success = [];
+
         if(!empty($_POST)){
             
             $id = isset($_POST["id"]) ? $_POST["id"] : "";
@@ -60,10 +96,10 @@ class AppController extends AbstractController
             $dt_naissance = isset($_POST["dt_naissance"]) ? $_POST["dt_naissance"] : "";
             $specialite = isset($_POST["specialite"]) ? $_POST["specialite"] : "";
             $cv = isset($_POST["cv"]) ? $_POST["cv"] : "";
-            $isAdmin = isset($_POST["isAdmin"]) ? true : false;
+            $isAdmin = ($_POST["isAdmin"])===1 ? true : false;
             
             if(strlen($prenom)<2 || strlen($prenom) >100) {
-                $erreurs[] = "le prenom doit contenir entre 2 et 99 caracteres";
+                $erreurs[] = "le prenom doit contenir entre 2 et 100 caracteres";
             }
             
             if(!filter_var($email , FILTER_VALIDATE_EMAIL)){
@@ -71,7 +107,11 @@ class AppController extends AbstractController
             }
 
             if(strlen("nom")<2 || strlen("nom") >100) {
-                $erreurs[] = "le nom doit contenir entre 2 et 99 caracteres";
+                $erreurs[] = "le nom doit contenir entre 2 et 100 caracteres";
+            }
+
+            if(strlen($specialite)<2 || strlen($specialite) >100) {
+                $erreurs[] = "la specialite doit contenir entre 2 et 100 caracteres";
             }
 
             if(empty($dt_naissance)){
@@ -107,14 +147,13 @@ class AppController extends AbstractController
             $success[] = "l'etudiant a ete ajoute avec succes";
             $erreurs=[];
             sleep(2);
+            $_SESSION["flash"]="l'etudiant a ete ajoute avec success";
             header("Location: " . URL);
-
         }
 
         $data = [
             "titre" => "Ajouter un etudiant",
             "erreurs" => $erreurs,
-            "success" => $success,
             "data_form"=>[
                 "id" => $id,
                 "prenom" => $prenom,
@@ -170,7 +209,7 @@ class AppController extends AbstractController
             $isAdmin = isset($_POST["isAdmin"]) ? true : false;
             
             if(strlen($prenom)<2 || strlen($prenom) >100) {
-                $erreurs[] = "le prenom doit contenir entre 2 et 99 caracteres";
+                $erreurs[] = "le prenom doit contenir entre 2 et 100 caracteres";
             }
             
             if(!filter_var($email , FILTER_VALIDATE_EMAIL)){
@@ -178,7 +217,11 @@ class AppController extends AbstractController
             }
 
             if(strlen($nom)<2 || strlen($nom) >100) {
-                $erreurs[] = "le nom doit contenir entre 2 et 99 caracteres";
+                $erreurs[] = "le nom doit contenir entre 2 et 100 caracteres";
+            }
+
+            if(strlen($specialite)<2 || strlen($specialite) >100) {
+                $erreurs[] = "la specialite doit contenir entre 2 et 100 caracteres";
             }
 
             if(empty($dt_naissance)){
@@ -199,18 +242,19 @@ class AppController extends AbstractController
                 "dt_naissance" => $dt_naissance,
                 "specialite" => $specialite,
                 "cv" => $cv,
-                "isAdmin" => $isAdmin
+                "isAdmin" => $isAdmin,
+                "dt_mis_a_jour" => date("Y-m-d H:i:s")
             ];
                 
-            BDD::getInstance()->query("UPDATE etudiants SET prenom = :prenom, nom = :nom, email = :email, dt_naissance = :dt_naissance, specialite = :specialite, cv = :cv, isAdmin = :isAdmin WHERE id = :id", $etudiant);
-            $success[] = "l'etudiant a ete modifie avec succes";
+            BDD::getInstance()->query("UPDATE etudiants SET prenom = :prenom, nom = :nom, email = :email, dt_naissance = :dt_naissance, specialite = :specialite, cv = :cv, isAdmin = :isAdmin, dt_mis_a_jour = :dt_mis_a_jour WHERE id = :id", $etudiant);
+            $_SESSION["flash"]="l'etudiant a ete modifie avec success";
+            header("Location: " . URL);
             $erreurs=[];
         }
         
         $data =[
             "titre" => "Editer un etudiant",
             "erreurs" => $erreurs,
-            "success" => $success,
             "data_form"=>[
                 "id" => $id,
                 "prenom" => $prenom,
@@ -226,4 +270,24 @@ class AppController extends AbstractController
         $this->render("edit_etudiant", $data);
     }    
 
+    public function delete_etudiant(string $id){
+        $etudiant = BDD::getInstance()->query("SELECT * FROM etudiants WHERE id = :id", ["id"=>$id]);
+
+        if(empty($etudiant)){
+            $data = [
+                "titre" => "Erreur",
+                "contenu" => [
+                    "num" => 404,
+                    "msg" => "L'etudiant demandé n'existe pas"
+                ]
+            ];
+
+            $this->render("erreur", $data);
+            die();
+        }
+
+        BDD::getInstance()->query("DELETE FROM etudiants WHERE id = :id", ["id"=>$id]);
+        $_SESSION["flash"]="l'etudiant a ete supprime avec success";
+        header("Location: " . URL);
+    }
 }
