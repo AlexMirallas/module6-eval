@@ -14,10 +14,15 @@ if (isset($_GET['page']) && !empty($_GET['page'])) {
 
 
 $routes = [
-    "/" => ["home", "FrontController"],
-    "erreur401" => ["erreur401", "ErreurController"] 
+    "/" => ["home", "AppController"],
+    "erreur401" => ["erreur401", "ErreurController"],
+    "etudiant" => ["etudiant", "AppController"],
+    "erreur" => ["erreur", "ErreurController"],
+    "etudiant/new" => ["new_etudiant", "AppController"],
+    "etudiant/edit" => ["edit_etudiant", "AppController"],
 ];
 
+require_once "Utils/utils.php";
 require_once "Controller/AbstractController.php";
 require_once "Model/BDD.php";
 require_once "Controller/AppController.php";
