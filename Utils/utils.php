@@ -28,11 +28,27 @@ function isAdmin($isAdmin){
     }
 }
 
-function flash(){
+function flashTitre(){
 
-    if(isset($_SESSION["flash"])){
-        $message = $_SESSION["flash"];
-        unset($_SESSION["flash"]);
+    if(isset($_SESSION["titre"])){
+        $titre = $_SESSION["titre"];
+        unset($_SESSION["titre"]);
+        return $titre;
+    }
+}
+
+function flashMessage(){
+    if(isset($_SESSION["message"])){
+        $message = $_SESSION["message"];
+        unset($_SESSION["message"]);
         return $message;
+    }
+}
+
+function flashType(){
+    if(isset($_SESSION["type"])){
+        $type = $_SESSION["type"];
+        unset($_SESSION["type"]);
+        return $type;
     }
 }

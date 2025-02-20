@@ -1,10 +1,8 @@
 <main class="container-fluid">
-    <?php if(isset($_SESSION["flash"])) :?>
-    <div class="row d-flex justify-content-center">
-        <div class="col-8">
-            <h2 class="bg-info text-white text-center py-3 rounded">
-                <?php echo flash() ?>
-            </h2>
+    <?php if(isset($_SESSION)) : ?>
+        <div class="text-center alert alert-<?php echo flashType() ?>" role="alert" id="flash">
+            <h2><?php echo flashTitre()  ?></h2>
+            <p><?php echo flashMessage() ?></p>
         </div>
     <?php endif; ?>
     </div>
@@ -12,7 +10,7 @@
         <div class="col-2 border-end">
             <h2 class="my-4">Bienvenue M. Admin</h2>
             <div class="list-group">
-                <a href="#" class="list-group-item list-group-item-action active" aria-current="true">
+                <a href="<?php echo URL ?>" class="list-group-item list-group-item-action active" aria-current="true">
                      Tout les etudiants 
                 </a>
                 <a href="#" class="list-group-item list-group-item-action" id="stats">Statistiques</a>
@@ -46,30 +44,13 @@
                             <td>
                                 <a href="<?php echo URL . "?page=etudiant&id=" . $etudiant["id"] ?>" class="btn btn-outline-info text-black">Plus de details</a>
                                 <a href="<?php echo URL . "?page=etudiant/edit&id=" . $etudiant["id"] ?>" class="btn btn-outline-warning text-black">Modifier</a>
-                                <a href="<?php echo URL . "?page=etudiant/delete&id=" . $etudiant["id"] ?>" class="btn btn-outline-danger text-black" data-bs-toggle="modal" data-bs-target="#deleteModal">Supprimer</a>
+                                <a href="<?php echo URL . "?page=etudiant/delete&id=" . $etudiant["id"] ?>"  class="btn btn-outline-danger text-black" onclick="return confirm('Etes vous sûr de vouloir supprimmer?')">Supprimer</a>
                             </td>
                         </tr>
                         </a>
                     <?php endforeach; ?>
                 </tbody>
             </table>   
-        </div>
-    </div>
-    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header bg-danger text-white">
-                    <h5 class="modal-title" id="deleteModalLabel">Confirmer</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <p class="mb-0">Êtes-vous sûr de vouloir supprimer cet élément ? Cette action ne peut pas être annulée.</p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                    <button type="submit" class="btn btn-danger" id="confirmDelete"><a href="<?php echo URL . "?page=etudiant/delete&id=" . $etudiant["id"] ?>">Supprimer</a></button>
-                </div>
-            </div>
         </div>
     </div>
 </main>

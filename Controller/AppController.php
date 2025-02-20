@@ -114,8 +114,8 @@ class AppController extends AbstractController
                 $erreurs[] = "la specialite doit contenir entre 2 et 100 caracteres";
             }
 
-            if(empty($dt_naissance)){
-                $erreurs[] = "la date de naissance est obligatoire";
+            if(empty($dt_naissance) || $dt_naissance > date("Y-m-d")){
+                $erreurs[] = "la date de naissance est obligatoire et tu ne peux pas naître demain";
             }
 
             if(strlen($cv) > 65000){
@@ -144,10 +144,11 @@ class AppController extends AbstractController
             ];
                 
             BDD::getInstance()->query("INSERT INTO etudiants (id, prenom, nom, email, dt_naissance, specialite, cv, isAdmin) VALUES (:id, :prenom, :nom, :email, :dt_naissance, :specialite, :cv, :isAdmin)", $etudiant);
-            $success[] = "l'etudiant a ete ajoute avec succes";
             $erreurs=[];
             sleep(2);
-            $_SESSION["flash"]="l'etudiant a ete ajoute avec success";
+            $_SESSION["type"]="success";
+            $_SESSION["titre"]="l'etudiant a ete ajoute avec success";
+            $_SESSION["message"]="vous allez etre redirige vers la page d'accueil";
             header("Location: " . URL);
         }
 
@@ -247,7 +248,9 @@ class AppController extends AbstractController
             ];
                 
             BDD::getInstance()->query("UPDATE etudiants SET prenom = :prenom, nom = :nom, email = :email, dt_naissance = :dt_naissance, specialite = :specialite, cv = :cv, isAdmin = :isAdmin, dt_mis_a_jour = :dt_mis_a_jour WHERE id = :id", $etudiant);
-            $_SESSION["flash"]="l'etudiant a ete modifie avec success";
+            $_SESSION["type"]="info";
+            $_SESSION["titre"]="l'etudiant a ete modifie avec success";
+            $_SESSION["message"]="Vous pouvez voir les modifications dans la liste des etudiants";
             header("Location: " . URL);
             $erreurs=[];
         }
@@ -287,7 +290,9 @@ class AppController extends AbstractController
         }
 
         BDD::getInstance()->query("DELETE FROM etudiants WHERE id = :id", ["id"=>$id]);
-        $_SESSION["flash"]="l'etudiant a ete supprime avec success";
+        $_SESSION["type"]="danger";
+        $_SESSION["titre"] ="l'etudiant a ete supprime avec success";
+        $_SESSION["message"]="Vous pouvez voir les modifications dans la liste des etudiants";
         header("Location: " . URL);
     }
 }
